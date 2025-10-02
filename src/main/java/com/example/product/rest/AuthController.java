@@ -1,12 +1,15 @@
 package com.example.product.rest;
 
+import com.example.product.dto.LoginRequest;
 import com.example.product.entity.User;
 import com.example.product.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -23,16 +26,18 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(
-            @RequestBody Map<String, String> loginRequest,
+            @Valid @RequestBody LoginRequest loginRequest,
+            BindingResult bindingResult,
             HttpServletRequest request) {
 
-        String email = loginRequest.get("email");
-        String password = loginRequest.get("password");
-
-        if (email == null || password == null) {
+        // Check validation errors
+        if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest()
-                    .body(createErrorResponse("Email và mật khẩu không được để trống"));
+                    .body(createValidationErrorResponse(bindingResult));
         }
+
+        String email = loginRequest.getEmail();
+        String password = loginRequest.getPassword();
 
         var userOpt = authService.authenticate(email, password);
 
@@ -55,6 +60,15 @@ public class AuthController {
         response.put("success", true);
         response.put("message", "Đăng nhập thành công");
         response.put("user", createUserResponse(user));
+        
+        // Redirect URL dựa trên role
+        String redirectUrl;
+        if (user.isAdmin()) {
+            redirectUrl = "/web/admin";  // Admin đi tới trang quản trị
+        } else {
+            redirectUrl = "/web/dashboard";  // User đi tới trang chủ user
+        }
+        response.put("redirectUrl", redirectUrl);
 
         return ResponseEntity.ok(response);
     }
@@ -122,6 +136,22 @@ public class AuthController {
         String message = hasPermission ? "Có quyền" : "Không có quyền";
 
         return ResponseEntity.ok(createPermissionResponse(hasPermission, message));
+    }
+
+    private Map<String, Object> createValidationErrorResponse(BindingResult bindingResult) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", false);
+        
+        StringBuilder errorMessage = new StringBuilder();
+        bindingResult.getFieldErrors().forEach(error -> {
+            if (errorMessage.length() > 0) {
+                errorMessage.append("; ");
+            }
+            errorMessage.append(error.getDefaultMessage());
+        });
+        
+        response.put("message", errorMessage.toString());
+        return response;
     }
 
     private Map<String, Object> createErrorResponse(String message) {

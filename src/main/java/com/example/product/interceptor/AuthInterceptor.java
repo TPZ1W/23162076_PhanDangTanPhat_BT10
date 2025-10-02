@@ -57,6 +57,15 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         // Check permissions based on URL patterns
         if (!hasRequiredPermission(currentUser, uri, method)) {
+            // Special case: redirect admin to admin dashboard if they try to access user dashboard
+            if (uri.startsWith("/web/dashboard") && currentUser.isAdmin()) {
+                try {
+                    response.sendRedirect("/web/admin");
+                    return false;
+                } catch (IOException e) {
+                    log.error("Error redirecting admin to admin dashboard", e);
+                }
+            }
             handleForbidden(request, response, "Access denied");
             return false;
         }
@@ -70,6 +79,7 @@ public class AuthInterceptor implements HandlerInterceptor {
                 uri.startsWith("/web/register") ||
                 uri.equals("/web/") ||
                 uri.equals("/web") ||
+                uri.equals("/") ||
                 uri.startsWith("/css/") ||
                 uri.startsWith("/js/") ||
                 uri.startsWith("/images/") ||
@@ -135,7 +145,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         try {
             String[] parts = uri.split("/");
             if (parts.length >= 4 && "products".equals(parts[2])) {
-                Long productId = Long.parseLong(parts[3]);
+                // Long productId = Long.parseLong(parts[3]);
                 // You would need to inject ProductService to check ownership
                 // For now, assume user can edit their own products
                 return authService.hasPermission(user, "EDIT_OWN_PRODUCT");

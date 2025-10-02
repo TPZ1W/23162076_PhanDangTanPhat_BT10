@@ -129,13 +129,11 @@
                         if (result.success) {
                             showMessage('Đăng nhập thành công!', 'success');
 
-                            // Redirect based on user role
+                            // Redirect based on provided URL from server
                             setTimeout(() => {
-                                if (result.user.isAdmin) {
-                                    window.location.href = '/web/admin';
-                                } else {
-                                    window.location.href = '/web/dashboard';
-                                }
+                                const redirectUrl = result.redirectUrl || 
+                                    (result.user.isAdmin ? '/web/admin' : '/web/dashboard');
+                                window.location.href = redirectUrl;
                             }, 1000);
                         } else {
                             showMessage(result.message || 'Đăng nhập thất bại', 'error');
