@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}">
+<body>
+<div layout:fragment="content">
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-warning text-dark">
+                <h2 class="mb-0">Edit User</h2>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/admin/users/saveOrUpdate}" th:object="${user}" method="post">
+                    <input type="hidden" th:field="*{id}"/>
+
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" th:field="*{username}" class="form-control"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" th:field="*{email}" class="form-control"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" th:field="*{password}" class="form-control"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Role</label>
+                        <select th:field="*{role}" class="form-control">
+                            <option value="USER" th:selected="${user.role=='USER'}">User</option>
+                            <option value="ADMIN" th:selected="${user.role=='ADMIN'}">Admin</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <a th:href="@{/admin/users}" class="btn btn-secondary">Back to list</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

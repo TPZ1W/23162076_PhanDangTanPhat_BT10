@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}">
+<body>
+<div layout:fragment="content">
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-header bg-success text-white">
+                <h2 class="mb-0">Add New Video</h2>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/admin/videos/saveOrUpdate}" th:object="${video}" method="post">
+
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input type="text" th:field="*{title}" class="form-control"/>
+                        <div class="text-danger" th:if="${#fields.hasErrors('title')}" 
+                             th:errors="*{title}"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea th:field="*{description}" class="form-control" rows="4"></textarea>
+                        <div class="text-danger" th:if="${#fields.hasErrors('description')}" 
+                             th:errors="*{description}"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">URL</label>
+                        <input type="text" th:field="*{url}" class="form-control" placeholder="https://youtube.com/..."/>
+                        <div class="text-danger" th:if="${#fields.hasErrors('url')}" 
+                             th:errors="*{url}"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select th:field="*{category.id}" class="form-select">
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" 
+                                    th:text="${cat.categoryName}"></option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a th:href="@{/admin/videos}" class="btn btn-secondary">Back to list</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

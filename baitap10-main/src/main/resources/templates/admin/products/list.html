@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{admin/layout}">
+<body>
+	<div layout:fragment="content">
+		<div class="container mt-5">
+			<div class="card shadow-lg">
+				<div
+					class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+					<h2 class="mb-0">Product List</h2>
+					<a th:href="@{/admin/products/add}" class="btn btn-success btn-sm">Add
+						New Product</a>
+				</div>
+				<div class="card-body">
+
+					<!-- Search form -->
+					<form class="row g-3 mb-3" th:action="@{/admin/products/search}"
+						method="get">
+						<div class="col-md-6">
+							<input type="text" name="name" class="form-control"
+								placeholder="Search by product name" th:value="${param.name}" />
+						</div>
+						<div class="col-md-2">
+							<button type="submit" class="btn btn-primary w-100">Search</button>
+						</div>
+					</form>
+
+					<!-- Product table -->
+					<div class="table-responsive">
+						<table class="table table-bordered table-striped align-middle">
+							<thead class="table-dark">
+								<tr>
+									<th>ID</th>
+									<th>Name</th>
+									<th>Description</th>
+									<th>Price</th>
+									<th>Category</th>
+									<th class="text-center">Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="product : ${products}">
+									<td th:text="${product.id}"></td>
+									<td th:text="${product.name}"></td>
+									<td th:text="${product.description}"></td>
+									<td th:text="${product.price}"></td>
+									<td th:text="${product.category.categoryName}"></td>
+									<td class="text-center"><a
+										th:href="@{/admin/products/edit/{id}(id=${product.id})}"
+										class="btn btn-warning btn-sm">Edit</a> <a
+										th:href="@{/admin/products/delete/{id}(id=${product.id})}"
+										class="btn btn-danger btn-sm"
+										onclick="return confirm('Are you sure you want to delete this product?');">Delete</a>
+									</td>
+								</tr>
+								<tr th:if="${#lists.isEmpty(products)}">
+									<td colspan="6" class="text-center text-muted">No products
+										found</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="text-center mt-4">
+						<a th:href="@{/admin/home}" class="btn btn-danger btn-lg shadow">Back
+							to Dashboard</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
